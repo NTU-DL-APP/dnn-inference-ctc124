@@ -6,8 +6,15 @@ def relu(x):
     return np.maximum(0, x)
 
 def softmax(x):
-    e = np.exp(x - np.max(x, axis=-1, keepdims=True))
-    return e / np.sum(e, axis=-1, keepdims=True)
+    # 支援批次輸入 (2D)，axis=-1 代表對最後一軸做 softmax
+    x = np.array(x)
+    x_max = np.max(x, axis=-1, keepdims=True)
+    e_x = np.exp(x - x_max)
+    sum_e_x = np.sum(e_x, axis=-1, keepdims=True)
+    return e_x / sum_e_x
+#def softmax(x):
+#    e = np.exp(x - np.max(x, axis=-1, keepdims=True))
+#    return e / np.sum(e, axis=-1, keepdims=True)
 #def relu(x):
 #    return np.maximum(0, x)
 
