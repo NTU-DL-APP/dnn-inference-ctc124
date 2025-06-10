@@ -10,8 +10,9 @@ def softmax(x):
     x = np.array(x)
     x_max = np.max(x, axis=-1, keepdims=True)
     e_x = np.exp(x - x_max)
-    sum_e_x = np.sum(e_x, axis=-1, keepdims=True)
-    return e_x / sum_e_x
+    #sum_e_x = np.sum(e_x, axis=-1, keepdims=True)
+    #return e_x / sum_e_x
+    return e_x / np.sum(e_x, axis=-1, keepdims=True)
 #def softmax(x):
 #    e = np.exp(x - np.max(x, axis=-1, keepdims=True))
 #    return e / np.sum(e, axis=-1, keepdims=True)
