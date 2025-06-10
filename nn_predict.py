@@ -42,6 +42,36 @@ def dense(x, W, b):
 # Infer TensorFlow h5 model using numpy
 # Support only Dense, Flatten, relu, softmax now
 def nn_forward_h5(model_arch, weights, data):
+    # 處理 Keras to_json() 格式
+    if isinstance(model_arch, dict) and "config" in model_arch and "layers" in model_arch["config"]:
+        model_arch = model_arch["config"]["layers"]
+    x = data
+    weight_idx = 0  # 用來依序取權重
+    for layer in model_arch:
+        # 兼容 Keras to_json() 層格式
+        if 'class_name' in layer and 'config' in layer:
+            ltype = layer['class_name']
+            cfg = layer['config']
+        else:
+            ltype = layer['type']
+            cfg = layer['config']
+        if ltype == "Flatten":
+            x = flatten(x)
+        elif ltype == "Dense":
+            W = weights['arr_%d' % weight_idx]
+            b = weights['arr_%d' % (weight_idx + 1)]
+            weight_idx += 2
+            x = dense(x, W, b)
+            if cfg.get("activation") == "relu":
+                x = relu(x)
+            elif cfg.get("activation") == "softmax":
+                x = softmax(x)
+    return x
+
+
+'''def nn_forward_h5(model_arch, weights, data):
+     if isinstance(model_arch, dict) and "config" in model_arch and "layers" in model_arch["config"]:
+        model_arch = model_arch["config"]["layers"]
     x = data
     for layer in model_arch:
         lname = layer['name']
@@ -61,7 +91,7 @@ def nn_forward_h5(model_arch, weights, data):
                 x = softmax(x)
 
     return x
-
+'''
 
 # You are free to replace nn_forward_h5() with your own implementation 
 def nn_inference(model_arch, weights, data):
